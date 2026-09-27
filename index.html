@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>糖果俄羅斯方塊 - Tetris Jr.</title>
+
+  <!-- PWA & Mobile Web App Meta -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#FFF6E5" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="bg-[#FFF6E5] text-[#4A3000] select-none overflow-hidden m-0 p-0 font-sans">
+  <div id="app" class="relative w-screen h-screen flex flex-col justify-between overflow-hidden">
+
+    <!-- 頂部極簡懸浮 HUD (Score & Mode & Settings) -->
+    <header class="absolute top-2 left-0 right-0 z-20 flex items-center justify-between px-4 pointer-events-none">
+      <!-- 左上角：難度與模式標籤 -->
+      <button id="btnOpenMenu" class="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-[#FAD2E1] shadow-sm text-xs font-bold text-[#4A3000] active:scale-95 transition-transform">
+        <span id="hudDifficultyEmoji">🍡</span>
+        <span id="hudDifficultyName">棉花糖級</span>
+        <span class="text-[10px] text-[#A67C52] bg-[#FFF2DE] px-1.5 py-0.5 rounded-full" id="hudModeName">闖關</span>
+      </button>
+
+      <!-- 正中央：分數與關卡膠囊 -->
+      <div class="pointer-events-auto flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#FAD2E1] shadow-md">
+        <div class="text-center">
+          <div class="text-[10px] uppercase font-bold text-[#A67C52] leading-none">SCORE</div>
+          <div id="hudScore" class="text-sm font-black text-[#FF5277] leading-tight">0</div>
+        </div>
+        <div class="w-[1px] h-5 bg-[#FAD2E1]"></div>
+        <div class="text-center">
+          <div id="hudLevelLabel" class="text-[10px] uppercase font-bold text-[#A67C52] leading-none">LEVEL</div>
+          <div id="hudLevelVal" class="text-sm font-black text-[#38B6FF] leading-tight">1</div>
+        </div>
+      </div>
+
+      <!-- 右上角：設定與音樂開關 -->
+      <div class="pointer-events-auto flex items-center gap-1.5">
+        <button id="btnToggleBgm" class="w-8 h-8 rounded-full bg-white/85 backdrop-blur-md border border-[#FAD2E1] shadow-sm flex items-center justify-center text-sm active:scale-95 transition-transform">
+          🎵
+        </button>
+        <button id="btnOpenSettings" class="w-8 h-8 rounded-full bg-white/85 backdrop-blur-md border border-[#FAD2E1] shadow-sm flex items-center justify-center text-sm active:scale-95 transition-transform">
+          ⚙️
+        </button>
+      </div>
+    </header>
+
+    <!-- 中央核心：Pixi.js 遊戲畫布容器 (佔比 75%+) -->
+    <main id="gameCanvasContainer" class="relative flex-1 w-full h-full overflow-hidden touch-none"></main>
+
+    <!-- 底部半透明果凍懸浮觸控層 (Overlay Controls) -->
+    <footer id="touchControls" class="absolute bottom-3 left-0 right-0 z-20 flex items-end justify-between px-4 pb-2 pointer-events-none">
+      <!-- 👈 左手操控區：[ ← 左移 ] [ ↓ 軟降 ] [ → 右移 ] -->
+      <div class="pointer-events-auto flex items-center gap-2">
+        <button id="btnLeft" class="touch-btn w-14 h-14 rounded-2xl bg-white/75 backdrop-blur-lg border-2 border-[#BEE1E6] shadow-lg flex items-center justify-center text-2xl font-bold active:scale-90 active:bg-[#BEE1E6]/80 transition-all text-[#3D5A80]">
+          ◀
+        </button>
+        <button id="btnSoftDrop" class="touch-btn w-14 h-14 rounded-2xl bg-white/75 backdrop-blur-lg border-2 border-[#FDE2E4] shadow-lg flex items-center justify-center text-2xl font-bold active:scale-90 active:bg-[#FDE2E4]/80 transition-all text-[#E07A5F]">
+          ▼
+        </button>
+        <button id="btnRight" class="touch-btn w-14 h-14 rounded-2xl bg-white/75 backdrop-blur-lg border-2 border-[#BEE1E6] shadow-lg flex items-center justify-center text-2xl font-bold active:scale-90 active:bg-[#BEE1E6]/80 transition-all text-[#3D5A80]">
+          ▶
+        </button>
+      </div>
+
+      <!-- 👉 右手操控區：[ ⭐ 硬降 (星形大鍵) ] [ 🔄 旋轉 (糖果大鍵) ] -->
+      <div class="pointer-events-auto flex items-center gap-3">
+        <button id="btnHardDrop" class="touch-btn w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#FFF275] to-[#FFD13B] border-2 border-[#FFF] shadow-xl flex flex-col items-center justify-center active:scale-90 transition-all text-[#6B4B00]">
+          <span class="text-2xl leading-none">⭐</span>
+          <span class="text-[9px] font-black uppercase mt-0.5 tracking-wider">DROP</span>
+        </button>
+        <button id="btnRotate" class="touch-btn w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#FF9AA2] to-[#FFB7B2] border-2 border-[#FFF] shadow-xl flex flex-col items-center justify-center active:scale-90 transition-all text-white">
+          <span class="text-2xl leading-none">🔄</span>
+          <span class="text-[9px] font-black uppercase mt-0.5 tracking-wider">TURN</span>
+        </button>
+      </div>
+    </footer>
+
+    <!-- 彈窗：模式與難度選擇 (Menu Modal) -->
+    <div id="modalMenu" class="modal-overlay hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="modal-card bg-white/95 rounded-3xl p-5 max-w-sm w-full border-2 border-[#FAD2E1] shadow-2xl animate-pop">
+        <h2 class="text-xl font-black text-center text-[#FF5277] mb-1">🍬 糖果俄羅斯方塊 🍭</h2>
+        <p class="text-xs text-center text-[#A67C52] mb-4">選擇遊戲模式與適合你的甜點難度</p>
+
+        <!-- 模式切換 Tabs -->
+        <div class="flex rounded-2xl bg-[#FFF2DE] p-1 mb-4 border border-[#FAD2E1]">
+          <button id="tabModeQuest" class="flex-1 py-2 rounded-xl font-bold text-xs transition-all shadow-sm bg-white text-[#FF5277]">
+            🎮 關卡闖關 (20關)
+          </button>
+          <button id="tabModeEndless" class="flex-1 py-2 rounded-xl font-bold text-xs transition-all text-[#A67C52]">
+            🏆 經典無盡模式
+          </button>
+        </div>
+
+        <!-- 4 種難度卡片列表 -->
+        <div class="space-y-2 mb-5">
+          <!-- 1. 布丁級 -->
+          <div class="diff-card p-3 rounded-2xl border-2 border-[#E2E8F0] hover:border-[#FFD13B] cursor-pointer transition-all flex items-center gap-3 bg-white" data-diff="pudding">
+            <span class="text-3xl">🍮</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <span class="font-black text-sm text-[#4A3000]">布丁級</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-bold">簡單</span>
+              </div>
+              <div class="text-[11px] text-[#A67C52] mt-0.5">下落極慢、1秒鎖定超寬裕，失誤可救回</div>
+              <div class="text-[9px] text-[#6B7280] mt-0.5">適合客群：幼兒園/小一初學者零門檻</div>
+            </div>
+          </div>
+
+          <!-- 2. 棉花糖級 (預設) -->
+          <div class="diff-card p-3 rounded-2xl border-2 border-[#FF5277] bg-pink-50/40 cursor-pointer transition-all flex items-center gap-3" data-diff="marshmallow">
+            <span class="text-3xl">🍡</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <span class="font-black text-sm text-[#4A3000]">棉花糖級</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-pink-100 text-pink-700 font-bold">普通・推薦</span>
+              </div>
+              <div class="text-[11px] text-[#A67C52] mt-0.5">節奏舒適溫和、經典流暢休閒手感</div>
+              <div class="text-[9px] text-[#6B7280] mt-0.5">適合客群：國小中高年級日常休閒首選</div>
+            </div>
+          </div>
+
+          <!-- 3. 跳跳糖級 -->
+          <div class="diff-card p-3 rounded-2xl border-2 border-[#E2E8F0] hover:border-[#BF55EC] cursor-pointer transition-all flex items-center gap-3 bg-white" data-diff="poprocks">
+            <span class="text-3xl">🍬</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <span class="font-black text-sm text-[#4A3000]">跳跳糖級</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-bold">困難</span>
+              </div>
+              <div class="text-[11px] text-[#A67C52] mt-0.5">快速下落、節奏緊湊俐落，考驗預判</div>
+              <div class="text-[9px] text-[#6B7280] mt-0.5">適合客群：手速靈活、尋求挑戰感的小朋友</div>
+            </div>
+          </div>
+
+          <!-- 4. 超酸軟糖級 -->
+          <div class="diff-card p-3 rounded-2xl border-2 border-[#E2E8F0] hover:border-[#FF5277] cursor-pointer transition-all flex items-center gap-3 bg-white" data-diff="sourgummy">
+            <span class="text-3xl">⚡</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <span class="font-black text-sm text-[#4A3000]">超酸軟糖級</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-bold">超困難</span>
+              </div>
+              <div class="text-[11px] text-[#A67C52] mt-0.5">瞬間極速下落、微秒極限反射神經</div>
+              <div class="text-[9px] text-[#6B7280] mt-0.5">適合客群：挑戰手眼協調極限的高手</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 開始按鈕 -->
+        <button id="btnStartGame" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#FF6B8B] to-[#FF8E53] text-white font-black text-base shadow-lg shadow-pink-200 active:scale-95 transition-all">
+          開始甜點冒險！🚀
+        </button>
+      </div>
+    </div>
+
+    <!-- 彈窗：過關結算 (Level Clear Modal) -->
+    <div id="modalLevelClear" class="modal-overlay hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="modal-card bg-white/95 rounded-3xl p-6 max-w-xs w-full text-center border-2 border-[#FAD2E1] shadow-2xl animate-pop">
+        <div class="text-5xl mb-2 animate-bounce">🎉</div>
+        <h2 class="text-2xl font-black text-[#FF5277] mb-1">太棒了！過關！</h2>
+        <p class="text-xs text-[#A67C52] mb-3" id="clearLevelSubTitle">成功消除 10 行！</p>
+
+        <!-- 星星結算 -->
+        <div class="flex justify-center gap-2 text-4xl mb-4" id="clearStarsContainer">
+          <span>⭐</span><span>⭐</span><span>⭐</span>
+        </div>
+
+        <div class="bg-[#FFF2DE] rounded-2xl p-3 mb-5 border border-[#FAD2E1]">
+          <div class="text-xs text-[#A67C52]">本關得分</div>
+          <div class="text-2xl font-black text-[#4A3000]" id="clearScoreVal">12,450</div>
+        </div>
+
+        <button id="btnNextLevel" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#52D681] to-[#38B6FF] text-white font-black text-base shadow-md active:scale-95 transition-all">
+          下一關 ➡️
+        </button>
+      </div>
+    </div>
+
+    <!-- 彈窗：遊戲結束 (Game Over Modal) -->
+    <div id="modalGameOver" class="modal-overlay hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="modal-card bg-white/95 rounded-3xl p-6 max-w-xs w-full text-center border-2 border-[#FAD2E1] shadow-2xl animate-pop">
+        <div class="text-5xl mb-2">💥</div>
+        <h2 class="text-2xl font-black text-[#4A3000] mb-1">哎呀！堆滿了！</h2>
+        <p class="text-xs text-[#A67C52] mb-4">別氣餒，喝口水再來挑戰一次！</p>
+
+        <div class="bg-[#FFF2DE] rounded-2xl p-3 mb-5 border border-[#FAD2E1]">
+          <div class="text-xs text-[#A67C52]">最終得分</div>
+          <div class="text-2xl font-black text-[#FF5277]" id="overScoreVal">8,920</div>
+          <div class="text-[11px] text-[#A67C52] mt-1" id="overHighText">歷史最高：14,200</div>
+        </div>
+
+        <div class="flex gap-2">
+          <button id="btnRestart" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#FF6B8B] to-[#FF8E53] text-white font-black text-sm shadow-md active:scale-95 transition-all">
+            再玩一次 🔄
+          </button>
+          <button id="btnBackToMenu" class="px-4 py-3 rounded-2xl bg-white border border-[#FAD2E1] text-[#A67C52] font-bold text-sm active:scale-95 transition-all">
+            選單 🏠
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 彈窗：設定選單 (Settings Modal) -->
+    <div id="modalSettings" class="modal-overlay hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="modal-card bg-white/95 rounded-3xl p-5 max-w-xs w-full border-2 border-[#FAD2E1] shadow-2xl animate-pop">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-black text-[#4A3000]">⚙️ 遊戲設定</h3>
+          <button id="btnCloseSettings" class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold">✕</button>
+        </div>
+
+        <div class="space-y-4 mb-5 text-sm">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-[#4A3000]">🎵 現代樂團背景音樂</span>
+            <input type="checkbox" id="chkSettingBgm" class="toggle-switch" checked />
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-[#4A3000]">🔉 立體聲遊戲音效</span>
+            <input type="checkbox" id="chkSettingSfx" class="toggle-switch" checked />
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-[#4A3000]">📳 觸覺震動回饋</span>
+            <input type="checkbox" id="chkSettingHaptics" class="toggle-switch" checked />
+          </div>
+        </div>
+
+        <button id="btnSaveSettings" class="w-full py-3 rounded-2xl bg-[#FF6B8B] text-white font-bold text-sm active:scale-95 transition-all">
+          儲存並返回
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

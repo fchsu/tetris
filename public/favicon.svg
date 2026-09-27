@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="candyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B8B"/>
+      <stop offset="100%" stop-color="#FF8E53"/>
+    </linearGradient>
+  </defs>
+  <rect x="5" y="5" width="90" height="90" rx="24" fill="url(#candyGrad)"/>
+  <polygon points="50,20 58,38 78,38 62,50 68,68 50,56 32,68 38,50 22,38 42,38" fill="#FFF275"/>
+  <circle cx="44" cy="42" r="3" fill="#4A3000"/>
+  <circle cx="56" cy="42" r="3" fill="#4A3000"/>
+  <path d="M 45 48 Q 50 54 55 48" stroke="#4A3000" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

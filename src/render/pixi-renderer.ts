@@ -276,8 +276,17 @@ export class PixiRenderer {
       g.circle(rightEyeX, eyeY, eyeRadius).fill({ color: eyeColor, alpha: 0.9 * alpha });
       g.circle(rightEyeX + eyeRadius * 0.35, eyeY - eyeRadius * 0.35, eyeRadius * 0.35).fill({ color: 0xFFFFFF, alpha: 0.95 * alpha });
 
-      // 開朗張嘴 (D 形半圓)
-      g.arc(x + size * 0.5, eyeY + eyeRadius * 0.7, eyeRadius * 1.3, 0, Math.PI);
+      // 粉嫩腮紅
+      g.circle(leftEyeX - eyeRadius * 1.1, eyeY + eyeRadius * 1.1, eyeRadius * 1.1).fill({ color: 0xFF5D84, alpha: 0.45 * alpha });
+      g.circle(rightEyeX + eyeRadius * 1.1, eyeY + eyeRadius * 1.1, eyeRadius * 1.1).fill({ color: 0xFF5D84, alpha: 0.45 * alpha });
+
+      // 開朗張嘴 (D 形半圓) - 明確 moveTo 弧線起點並 closePath，解決自畫布 (0,0) 牽引的紅色射線問題
+      const mouthX = x + size * 0.5;
+      const mouthY = eyeY + eyeRadius * 0.7;
+      const mouthR = eyeRadius * 1.3;
+      g.moveTo(mouthX + mouthR, mouthY);
+      g.arc(mouthX, mouthY, mouthR, 0, Math.PI, false);
+      g.closePath();
       g.fill({ color: 0xFF5D84, alpha: 0.85 * alpha });
       g.stroke({ width: 1.2, color: eyeColor, alpha: 0.85 * alpha });
     }

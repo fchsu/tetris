@@ -83,7 +83,7 @@ export class AudioManager {
   }
 
   // 物理撥弦合成 (Karplus-Strong - 烏克麗麗)
-  private playPluck(freq: number, time: number, vol = 0.15, damping = 0.495): void {
+  private playPluck(freq: number, time: number, vol = 0.15, damping = 0.495, useSfxScale = true): void {
     const ac = this.init();
     const rate = ac.sampleRate;
     const period = Math.max(2, Math.round(rate / freq));
@@ -105,8 +105,9 @@ export class AudioManager {
     const src = ac.createBufferSource();
     src.buffer = buffer;
 
+    const scale = useSfxScale ? this.getSFXVolume() : 1;
     const gain = ac.createGain();
-    gain.gain.setValueAtTime(vol * this.getSFXVolume(), time);
+    gain.gain.setValueAtTime(vol * scale, time);
     gain.gain.exponentialRampToValueAtTime(0.001, time + 0.85);
 
     src.connect(gain);
@@ -115,9 +116,9 @@ export class AudioManager {
   }
 
   // 木琴物理泛音共振 (木棒敲擊 + 3組不和諧泛音)
-  private playMarimba(freq: number, time: number, vol = 0.2): void {
+  private playMarimba(freq: number, time: number, vol = 0.2, useSfxScale = true): void {
     const ac = this.init();
-    const sfxVol = this.getSFXVolume();
+    const scale = useSfxScale ? this.getSFXVolume() : 1;
 
     // 敲擊瞬態木質聲
     const noiseLen = Math.round(ac.sampleRate * 0.02);
@@ -133,7 +134,7 @@ export class AudioManager {
     filter.frequency.setValueAtTime(freq * 1.5, time);
     filter.Q.value = 3;
     const noiseGain = ac.createGain();
-    noiseGain.gain.setValueAtTime(vol * 0.7 * sfxVol, time);
+    noiseGain.gain.setValueAtTime(vol * 0.7 * scale, time);
     noiseSrc.connect(filter);
     filter.connect(noiseGain);
     this.route(noiseGain, 0.15);
@@ -151,7 +152,7 @@ export class AudioManager {
       const gain = ac.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq * p.mult, time);
-      gain.gain.setValueAtTime(vol * p.gain * sfxVol, time);
+      gain.gain.setValueAtTime(vol * p.gain * scale, time);
       gain.gain.exponentialRampToValueAtTime(0.001, time + p.dur);
       osc.connect(gain);
       this.route(gain, 0.4);
@@ -347,11 +348,20 @@ export class AudioManager {
     }
   }
 
+  public isBgmActive(): boolean {
+    return this.isBgmPlaying;
+  }
+
   public toggleBgm(): boolean {
     if (this.isBgmPlaying) {
       this.stopBgm();
+      StorageService.updateSettings({ bgmVolume: 0 });
       return false;
     } else {
+      const s = StorageService.load().settings;
+      if (s.bgmVolume <= 0) {
+        StorageService.updateSettings({ bgmVolume: 0.5 });
+      }
       this.startBgm();
       return true;
     }
@@ -385,7 +395,7 @@ export class AudioManager {
     if (bgmVol > 0) {
       if (sub === 0 || sub === 3 || sub === 4 || sub === 6) {
         chord.notes.forEach((freq, i) => {
-          this.playPluck(freq, now + i * 0.012, 0.12 * bgmVol);
+          this.playPluck(freq, now + i * 0.012, 0.12 * bgmVol, 0.495, false);
         });
       }
 
@@ -410,7 +420,7 @@ export class AudioManager {
 
       const mHit = melody.find(m => m.s === (this.bgmStep % 32));
       if (mHit) {
-        this.playMarimba(mHit.f, now, 0.2 * bgmVol);
+        this.playMarimba(mHit.f, now, 0.2 * bgmVol, false);
       }
     }
 

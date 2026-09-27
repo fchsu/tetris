@@ -134,11 +134,21 @@ function setupUI(game: GameEngine, renderer: PixiRenderer): void {
     modalMenu.classList.remove('hidden');
   });
 
+  // 初始化按鈕文字圖示
+  const initialSettings = StorageService.load().settings;
+  btnToggleBgm.textContent = initialSettings.bgmVolume > 0 ? '🎵' : '🔇';
+
   // 開始遊戲
   btnStartGame.addEventListener('click', () => {
     modalMenu.classList.add('hidden');
     game.restart();
     renderer.render();
+
+    const s = StorageService.load().settings;
+    if (s.bgmVolume > 0 && !AudioManager.getInstance().isBgmActive()) {
+      AudioManager.getInstance().startBgm();
+      btnToggleBgm.textContent = '🎵';
+    }
   });
 
   // 下一關
@@ -198,6 +208,9 @@ function setupUI(game: GameEngine, renderer: PixiRenderer): void {
       btnToggleBgm.textContent = '🔇';
     } else {
       btnToggleBgm.textContent = '🎵';
+      if (wasPlayingBeforeSettings && !AudioManager.getInstance().isBgmActive()) {
+        AudioManager.getInstance().startBgm();
+      }
     }
 
     modalSettings.classList.add('hidden');

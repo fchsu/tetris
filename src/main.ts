@@ -166,8 +166,15 @@ function setupUI(game: GameEngine, renderer: PixiRenderer): void {
     btnToggleBgm.textContent = isPlaying ? '🎵' : '🔇';
   });
 
-  // 設定彈窗
+  // 設定彈窗 (開啟時暫停遊戲)
+  let wasPlayingBeforeSettings = false;
+
   btnOpenSettings.addEventListener('click', () => {
+    wasPlayingBeforeSettings = game.status === 'playing';
+    if (wasPlayingBeforeSettings) {
+      game.pause();
+    }
+
     const s = StorageService.load().settings;
     (document.getElementById('chkSettingBgm') as HTMLInputElement).checked = s.bgmVolume > 0;
     (document.getElementById('chkSettingSfx') as HTMLInputElement).checked = s.soundVolume > 0;
@@ -194,6 +201,12 @@ function setupUI(game: GameEngine, renderer: PixiRenderer): void {
     }
 
     modalSettings.classList.add('hidden');
+
+    // 若打開前正在遊玩，關閉時恢復遊戲
+    if (wasPlayingBeforeSettings) {
+      game.resume();
+      wasPlayingBeforeSettings = false;
+    }
   };
 
   btnCloseSettings.addEventListener('click', closeSettings);

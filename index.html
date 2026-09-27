@@ -5,79 +5,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>糖果俄羅斯方塊 - Tetris Jr.</title>
 
-  <!-- PWA & Mobile Web App Meta -->
+  <!-- PWA Meta -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="manifest" href="/manifest.webmanifest" />
-  <meta name="theme-color" content="#FFF6E5" />
+  <meta name="theme-color" content="#FFF4D8" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <link rel="stylesheet" href="/src/style.css" />
 </head>
-<body class="bg-[#FFF6E5] text-[#4A3000] select-none overflow-hidden m-0 p-0 font-sans">
-  <div id="app" class="relative w-screen h-screen flex flex-col justify-between overflow-hidden">
+<body class="m-0 p-0 font-sans select-none overflow-hidden">
+  <!-- 童趣陽光彩虹糖果世界背景 -->
+  <div class="sky-background">
+    <!-- 太陽與陽光光暈 (左上方) -->
+    <div class="sun-container">
+      <div class="sun-rays"></div>
+      <div class="smiling-sun">
+        <div class="sun-face">
+          <div class="sun-eyes"></div>
+          <div class="sun-smile"></div>
+          <div class="sun-blush"></div>
+        </div>
+      </div>
+    </div>
 
-    <!-- 頂部極簡懸浮 HUD (Score & Mode & Settings) -->
-    <header class="absolute top-2 left-0 right-0 z-20 flex items-center justify-between px-4 pointer-events-none">
-      <!-- 左上角：難度與模式標籤 -->
-      <button id="btnOpenMenu" class="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-[#FAD2E1] shadow-sm text-xs font-bold text-[#4A3000] active:scale-95 transition-transform">
-        <span id="hudDifficultyEmoji">🍡</span>
-        <span id="hudDifficultyName">棉花糖級</span>
-        <span class="text-[10px] text-[#A67C52] bg-[#FFF2DE] px-1.5 py-0.5 rounded-full" id="hudModeName">闖關</span>
+    <!-- 柔和粉彩彩虹弧線 -->
+    <div class="pastel-rainbow"></div>
+
+    <!-- 飄浮白雲 -->
+    <div class="floating-cloud cloud-1"></div>
+    <div class="floating-cloud cloud-2"></div>
+    <div class="floating-cloud cloud-3"></div>
+
+    <!-- 底部糖果山丘與棒棒糖 -->
+    <div class="candy-hills">
+      <div class="hill hill-left"></div>
+      <div class="hill hill-right"></div>
+      <div class="lollipop lollipop-left"></div>
+      <div class="lollipop lollipop-right"></div>
+    </div>
+  </div>
+
+  <div id="app" class="relative w-full h-full flex flex-col justify-between overflow-hidden">
+
+    <!-- 頂部懸浮 HUD (大型可愛雲朵分數膠囊 + 選單按鈕) -->
+    <header class="top-hud">
+      <!-- 左上角：難度與選單按鈕 -->
+      <button id="btnOpenMenu" class="menu-pill-btn active:scale-95 transition-transform">
+        <span id="hudDifficultyEmoji" class="text-base">🍡</span>
+        <span id="hudDifficultyName" class="font-black text-xs text-[#5D3A1A]">棉花糖</span>
+        <span id="hudModeName" class="mode-tag">闖關</span>
       </button>
 
-      <!-- 正中央：分數與關卡膠囊 -->
-      <div class="pointer-events-auto flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#FAD2E1] shadow-md">
-        <div class="text-center">
-          <div class="text-[10px] uppercase font-bold text-[#A67C52] leading-none">SCORE</div>
-          <div id="hudScore" class="text-sm font-black text-[#FF5277] leading-tight">0</div>
+      <!-- 正中央：經典大白雲分數膠囊 (如同設計圖 SCORE: 12,450 / LEVEL: 7) -->
+      <div class="cloud-score-pill shadow-lg">
+        <div class="score-row">
+          <span class="label-score">SCORE:</span>
+          <span id="hudScore" class="val-score">0</span>
         </div>
-        <div class="w-[1px] h-5 bg-[#FAD2E1]"></div>
-        <div class="text-center">
-          <div id="hudLevelLabel" class="text-[10px] uppercase font-bold text-[#A67C52] leading-none">LEVEL</div>
-          <div id="hudLevelVal" class="text-sm font-black text-[#38B6FF] leading-tight">1</div>
+        <div class="level-row">
+          <span id="hudLevelLabel" class="label-level">LEVEL:</span>
+          <span id="hudLevelVal" class="val-level">1</span>
         </div>
       </div>
 
-      <!-- 右上角：設定與音樂開關 -->
-      <div class="pointer-events-auto flex items-center gap-1.5">
-        <button id="btnToggleBgm" class="w-8 h-8 rounded-full bg-white/85 backdrop-blur-md border border-[#FAD2E1] shadow-sm flex items-center justify-center text-sm active:scale-95 transition-transform">
-          🎵
-        </button>
-        <button id="btnOpenSettings" class="w-8 h-8 rounded-full bg-white/85 backdrop-blur-md border border-[#FAD2E1] shadow-sm flex items-center justify-center text-sm active:scale-95 transition-transform">
-          ⚙️
-        </button>
+      <!-- 右上角：設定與靜音按鈕 -->
+      <div class="flex items-center gap-1.5 pointer-events-auto">
+        <button id="btnToggleBgm" class="icon-circle-btn" title="切換背景音樂">🎵</button>
+        <button id="btnOpenSettings" class="icon-circle-btn" title="遊戲設定">⚙️</button>
       </div>
     </header>
 
     <!-- 中央核心：Pixi.js 遊戲畫布容器 (佔比 75%+) -->
-    <main id="gameCanvasContainer" class="relative flex-1 w-full h-full overflow-hidden touch-none"></main>
+    <main id="gameCanvasContainer" class="game-viewport"></main>
 
-    <!-- 底部半透明果凍懸浮觸控層 (Overlay Controls) -->
-    <footer id="touchControls" class="absolute bottom-3 left-0 right-0 z-20 flex items-end justify-between px-4 pb-2 pointer-events-none">
-      <!-- 👈 左手操控區：[ ← 左移 ] [ ↓ 軟降 ] [ → 右移 ] -->
-      <div class="pointer-events-auto flex items-center gap-2">
-        <button id="btnLeft" class="touch-btn w-14 h-14 rounded-2xl bg-white/75 backdrop-blur-lg border-2 border-[#BEE1E6] shadow-lg flex items-center justify-center text-2xl font-bold active:scale-90 active:bg-[#BEE1E6]/80 transition-all text-[#3D5A80]">
-          ◀
+    <!-- 底部半透明果凍懸浮觸控層 (左手位移、右手硬降與旋轉) -->
+    <footer id="touchControls">
+      <!-- 👈 左手操控區：[ ◀ 左移 ] [ ▼ 軟降 ] [ ▶ 右移 ] (冰晶透明果凍方塊) -->
+      <div class="dpad-group">
+        <button id="btnLeft" class="jelly-btn jelly-btn-arrow" aria-label="左移">
+          <span class="btn-arrow-icon">◀</span>
         </button>
-        <button id="btnSoftDrop" class="touch-btn w-14 h-14 rounded-2xl bg-white/75 backdrop-blur-lg border-2 border-[#FDE2E4] shadow-lg flex items-center justify-center text-2xl font-bold active:scale-90 active:bg-[#FDE2E4]/80 transition-all text-[#E07A5F]">
-          ▼
+        <button id="btnSoftDrop" class="jelly-btn jelly-btn-arrow" aria-label="軟降">
+          <span class="btn-arrow-icon">▼</span>
         </button>
-        <button id="btnRight" class="touch-btn w-14 h-14 rounded-2xl bg-white/75 backdrop-blur-lg border-2 border-[#BEE1E6] shadow-lg flex items-center justify-center text-2xl font-bold active:scale-90 active:bg-[#BEE1E6]/80 transition-all text-[#3D5A80]">
-          ▶
+        <button id="btnRight" class="jelly-btn jelly-btn-arrow" aria-label="右移">
+          <span class="btn-arrow-icon">▶</span>
         </button>
       </div>
 
       <!-- 👉 右手操控區：[ ⭐ 硬降 (星形大鍵) ] [ 🔄 旋轉 (糖果大鍵) ] -->
-      <div class="pointer-events-auto flex items-center gap-3">
-        <button id="btnHardDrop" class="touch-btn w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#FFF275] to-[#FFD13B] border-2 border-[#FFF] shadow-xl flex flex-col items-center justify-center active:scale-90 transition-all text-[#6B4B00]">
-          <span class="text-2xl leading-none">⭐</span>
-          <span class="text-[9px] font-black uppercase mt-0.5 tracking-wider">DROP</span>
+      <div class="action-group">
+        <!-- ⭐ 大星星硬降按鍵 (微微笑臉、金黃漸層) -->
+        <button id="btnHardDrop" class="star-drop-btn" aria-label="星星硬降">
+          <div class="star-icon-wrap">
+            <span class="star-char">⭐</span>
+          </div>
+          <span class="btn-text-badge">DROP</span>
         </button>
-        <button id="btnRotate" class="touch-btn w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#FF9AA2] to-[#FFB7B2] border-2 border-[#FFF] shadow-xl flex flex-col items-center justify-center active:scale-90 transition-all text-white">
-          <span class="text-2xl leading-none">🔄</span>
-          <span class="text-[9px] font-black uppercase mt-0.5 tracking-wider">TURN</span>
+
+        <!-- 🔄 糖果旋轉按鍵 (粉紅圓形糖果造型) -->
+        <button id="btnRotate" class="candy-rotate-btn" aria-label="旋轉方塊">
+          <div class="rotate-icon-wrap">
+            <span class="rotate-char">🔄</span>
+          </div>
+          <span class="btn-text-badge">ROTATE</span>
         </button>
       </div>
     </footer>
@@ -86,10 +119,10 @@
     <div id="modalMenu" class="modal-overlay hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="modal-card bg-white/95 rounded-3xl p-5 max-w-sm w-full border-2 border-[#FAD2E1] shadow-2xl animate-pop">
         <h2 class="text-xl font-black text-center text-[#FF5277] mb-1">🍬 糖果俄羅斯方塊 🍭</h2>
-        <p class="text-xs text-center text-[#A67C52] mb-4">選擇遊戲模式與適合你的甜點難度</p>
+        <p class="text-xs text-center text-[#A67C52] mb-3">選擇遊戲模式與適合你的甜點難度</p>
 
         <!-- 模式切換 Tabs -->
-        <div class="flex rounded-2xl bg-[#FFF2DE] p-1 mb-4 border border-[#FAD2E1]">
+        <div class="flex rounded-2xl bg-[#FFF2DE] p-1 mb-3 border border-[#FAD2E1]">
           <button id="tabModeQuest" class="flex-1 py-2 rounded-xl font-bold text-xs transition-all shadow-sm bg-white text-[#FF5277]">
             🎮 關卡闖關 (20關)
           </button>
@@ -99,9 +132,9 @@
         </div>
 
         <!-- 4 種難度卡片列表 -->
-        <div class="space-y-2 mb-5">
+        <div class="space-y-2 mb-4">
           <!-- 1. 布丁級 -->
-          <div class="diff-card p-3 rounded-2xl border-2 border-[#E2E8F0] hover:border-[#FFD13B] cursor-pointer transition-all flex items-center gap-3 bg-white" data-diff="pudding">
+          <div class="diff-card p-2.5 rounded-2xl border-2 border-[#E2E8F0] hover:border-[#FFD13B] cursor-pointer transition-all flex items-center gap-3 bg-white" data-diff="pudding">
             <span class="text-3xl">🍮</span>
             <div class="flex-1">
               <div class="flex items-center gap-2">
@@ -114,7 +147,7 @@
           </div>
 
           <!-- 2. 棉花糖級 (預設) -->
-          <div class="diff-card p-3 rounded-2xl border-2 border-[#FF5277] bg-pink-50/40 cursor-pointer transition-all flex items-center gap-3" data-diff="marshmallow">
+          <div class="diff-card p-2.5 rounded-2xl border-2 border-[#FF5277] bg-pink-50/40 cursor-pointer transition-all flex items-center gap-3" data-diff="marshmallow">
             <span class="text-3xl">🍡</span>
             <div class="flex-1">
               <div class="flex items-center gap-2">
@@ -127,7 +160,7 @@
           </div>
 
           <!-- 3. 跳跳糖級 -->
-          <div class="diff-card p-3 rounded-2xl border-2 border-[#E2E8F0] hover:border-[#BF55EC] cursor-pointer transition-all flex items-center gap-3 bg-white" data-diff="poprocks">
+          <div class="diff-card p-2.5 rounded-2xl border-2 border-[#E2E8F0] hover:border-[#BF55EC] cursor-pointer transition-all flex items-center gap-3 bg-white" data-diff="poprocks">
             <span class="text-3xl">🍬</span>
             <div class="flex-1">
               <div class="flex items-center gap-2">
@@ -140,7 +173,7 @@
           </div>
 
           <!-- 4. 超酸軟糖級 -->
-          <div class="diff-card p-3 rounded-2xl border-2 border-[#E2E8F0] hover:border-[#FF5277] cursor-pointer transition-all flex items-center gap-3 bg-white" data-diff="sourgummy">
+          <div class="diff-card p-2.5 rounded-2xl border-2 border-[#E2E8F0] hover:border-[#FF5277] cursor-pointer transition-all flex items-center gap-3 bg-white" data-diff="sourgummy">
             <span class="text-3xl">⚡</span>
             <div class="flex-1">
               <div class="flex items-center gap-2">

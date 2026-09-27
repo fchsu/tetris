@@ -1,4 +1,4 @@
-/* 全域與防誤觸設定 */
+/* 全域設定與防滾動邊界 */
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -6,83 +6,471 @@
   -webkit-user-select: none;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background: radial-gradient(circle at 50% 20%, #FFF8EA 0%, #FFF1D6 60%, #FFE6C2 100%);
-  touch-action: manipulation;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
   overflow: hidden;
-  width: 100vw;
-  height: 100vh;
+  position: fixed;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #FFF6E5;
 }
 
-/* 佈局 Utility Classes */
+#app {
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════
+   童趣陽光彩虹天空背景 (對齊設計圖)
+   ══════════════════════════════════════════ */
+.sky-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, #FFF1D2 0%, #FFE8CA 35%, #FFDFCF 70%, #FDE4EB 100%);
+  overflow: hidden;
+}
+
+/* 左上角微笑小太陽 */
+.sun-container {
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  width: 105px;
+  height: 105px;
+}
+
+.sun-rays {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 230, 110, 0.45) 0%, rgba(255, 209, 59, 0) 70%);
+}
+
+.smiling-sun {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #FFF9AA 0%, #FFD633 60%, #FFAA00 100%);
+  box-shadow: 0 4px 15px rgba(255, 170, 0, 0.35);
+}
+
+.sun-eyes {
+  position: absolute;
+  top: 32px;
+  left: 24px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #5D3A1A;
+  box-shadow: 22px 0 0 #5D3A1A;
+}
+
+.sun-smile {
+  position: absolute;
+  top: 38px;
+  left: 31px;
+  width: 12px;
+  height: 7px;
+  border-bottom: 2.5px solid #5D3A1A;
+  border-radius: 0 0 10px 10px;
+}
+
+.sun-blush {
+  position: absolute;
+  top: 36px;
+  left: 17px;
+  width: 7px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 107, 139, 0.5);
+  box-shadow: 32px 0 0 rgba(255, 107, 139, 0.5);
+}
+
+/* 頂部柔和彩虹拱門 */
+.pastel-rainbow {
+  position: absolute;
+  top: -120px;
+  right: -60px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  border: 14px solid rgba(255, 107, 139, 0.28);
+  border-top-color: transparent;
+  border-left-color: transparent;
+  transform: rotate(-35deg);
+  box-shadow:
+    inset 0 0 0 12px rgba(255, 179, 71, 0.25),
+    inset 0 0 0 24px rgba(255, 230, 110, 0.22),
+    inset 0 0 0 36px rgba(135, 230, 180, 0.22),
+    inset 0 0 0 48px rgba(110, 200, 255, 0.22);
+}
+
+/* 飄浮的可愛小雲朵 */
+.floating-cloud {
+  position: absolute;
+  background: #FFFFFF;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(186, 150, 160, 0.12);
+}
+
+.cloud-1 {
+  top: 60px;
+  left: 20px;
+  width: 55px;
+  height: 24px;
+  opacity: 0.85;
+}
+.cloud-1::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 12px;
+  width: 26px;
+  height: 26px;
+  background: #FFFFFF;
+  border-radius: 50%;
+}
+
+.cloud-2 {
+  top: 90px;
+  right: 18px;
+  width: 70px;
+  height: 28px;
+  opacity: 0.85;
+}
+.cloud-2::before {
+  content: '';
+  position: absolute;
+  top: -14px;
+  left: 18px;
+  width: 32px;
+  height: 32px;
+  background: #FFFFFF;
+  border-radius: 50%;
+}
+
+/* 底部綠色山丘與可愛糖果 */
+.candy-hills {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 110px;
+  pointer-events: none;
+}
+
+.hill-left {
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 180px;
+  height: 130px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #BDE0FE 0%, #A2D2FF 100%);
+  opacity: 0.55;
+}
+
+.hill-right {
+  position: absolute;
+  bottom: -50px;
+  right: -30px;
+  width: 200px;
+  height: 140px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #CDB4DB 0%, #FFC8DD 100%);
+  opacity: 0.5;
+}
+
+/* ══════════════════════════════════════════
+   頂部 HUD 與雲朵分數膠囊
+   ══════════════════════════════════════════ */
+.top-hud {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  pointer-events: none;
+}
+
+.menu-pill-btn {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid #FAD2E1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+}
+
+.mode-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #8C532A;
+  background: #FFE8CC;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+/* 中央大白雲分數膠囊 (如同設計圖 SCORE: 12,450 / LEVEL: 7) */
+.cloud-score-pill {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 18px;
+  border-radius: 20px;
+  background: #FFFFFF;
+  border: 2px solid #B8E0D2;
+  box-shadow: 0 4px 12px rgba(184, 224, 210, 0.35);
+}
+
+.score-row {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.label-score {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #5D3A1A;
+}
+
+.val-score {
+  font-size: 16px;
+  font-weight: 900;
+  color: #4A3000;
+  letter-spacing: 0.5px;
+}
+
+.level-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: -2px;
+}
+
+.label-level {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #38B6FF;
+}
+
+.val-level {
+  font-size: 13px;
+  font-weight: 900;
+  color: #38B6FF;
+}
+
+.icon-circle-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid #FAD2E1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.icon-circle-btn:active {
+  transform: scale(0.92);
+}
+
+/* ══════════════════════════════════════════
+   遊戲畫布 Viewport
+   ══════════════════════════════════════════ */
+.game-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* ══════════════════════════════════════════
+   底部半透明果凍懸浮按鍵 (100% 完整保留視野，無截斷)
+   ══════════════════════════════════════════ */
+#touchControls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right));
+  pointer-events: none;
+}
+
+/* 左側位移組 (◀ ▼ ▶) */
+.dpad-group {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.jelly-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 14px rgba(100, 140, 180, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.08s ease, background-color 0.08s ease;
+}
+
+.jelly-btn:active {
+  transform: scale(0.90) !important;
+  background: rgba(200, 235, 255, 0.9);
+}
+
+.btn-arrow-icon {
+  font-size: 20px;
+  font-weight: 900;
+  color: #3D6B99;
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.8));
+}
+
+/* 右側動作組 (⭐ DROP / 🔄 ROTATE) */
+.action-group {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ⭐ 大星星硬降按鍵 (金黃微笑星) */
+.star-drop-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #FFF37A 0%, #FFD02F 55%, #FFA700 100%);
+  border: 2.5px solid #FFFFFF;
+  box-shadow: 0 6px 18px rgba(255, 167, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.08s ease;
+}
+
+.star-drop-btn:active {
+  transform: scale(0.90) !important;
+  filter: brightness(0.96);
+}
+
+.star-char {
+  font-size: 24px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(100, 60, 0, 0.2));
+}
+
+/* 🔄 糖果旋轉按鍵 (粉紅圓形糖果造型) */
+.candy-rotate-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #FFAEC0 0%, #FF6584 55%, #E63956 100%);
+  border: 2.5px solid #FFFFFF;
+  box-shadow: 0 6px 18px rgba(255, 101, 132, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.08s ease;
+}
+
+.candy-rotate-btn:active {
+  transform: scale(0.90) !important;
+  filter: brightness(0.96);
+}
+
+.rotate-char {
+  font-size: 24px;
+  line-height: 1;
+  color: #FFFFFF;
+}
+
+.btn-text-badge {
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #FFFFFF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  margin-top: 1px;
+}
+
+.star-drop-btn .btn-text-badge {
+  color: #6B4500;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+/* ══════════════════════════════════════════
+   彈窗與通用類別
+   ══════════════════════════════════════════ */
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
 .items-center { align-items: center; }
-.items-end { align-items: flex-end; }
-.justify-between { justify-content: space-between; }
 .justify-center { justify-content: center; }
-.text-center { text-align: center; }
-.flex-1 { flex: 1 1 0%; }
-
-.relative { position: relative; }
-.absolute { position: absolute; }
+.justify-between { justify-content: space-between; }
+.flex-1 { flex: 1; }
+.hidden { display: none !important; }
 .fixed { position: fixed; }
 .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
-.top-2 { top: 0.5rem; }
-.left-0 { left: 0; }
-.right-0 { right: 0; }
-.bottom-2 { bottom: 0.5rem; }
-.bottom-3 { bottom: 0.75rem; }
-.z-20 { z-index: 20; }
 .z-50 { z-index: 50; }
-
-.pointer-events-none { pointer-events: none; }
-.pointer-events-auto { pointer-events: auto; }
-.hidden { display: none !important; }
-.overflow-hidden { overflow: hidden; }
-
-.w-screen { width: 100vw; }
-.h-screen { height: 100vh; }
-.w-full { width: 100%; }
-.h-full { height: 100%; }
-.max-w-sm { max-width: 24rem; }
-.max-w-xs { max-width: 20rem; }
-
-.w-8 { width: 2rem; }
-.h-8 { height: 2rem; }
-.w-7 { width: 1.75rem; }
-.h-7 { height: 1.75rem; }
-.w-14 { width: 3.5rem; }
-.h-14 { height: 3.5rem; }
-.w-16 { width: 4.2rem; }
-.h-16 { height: 4.2rem; }
-
-.gap-1 { gap: 0.25rem; }
-.gap-1\.5 { gap: 0.375rem; }
-.gap-2 { gap: 0.5rem; }
-.gap-2\.5 { gap: 0.625rem; }
-.gap-3 { gap: 0.75rem; }
-.gap-4 { gap: 1rem; }
-
-.p-0 { padding: 0; }
-.p-1 { padding: 0.25rem; }
-.p-2 { padding: 0.5rem; }
-.p-3 { padding: 0.75rem; }
 .p-4 { padding: 1rem; }
 .p-5 { padding: 1.25rem; }
 .p-6 { padding: 1.5rem; }
-.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-.px-4 { padding-left: 1rem; padding-right: 1rem; }
-.py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+.p-1 { padding: 0.25rem; }
+.p-2\.5 { padding: 0.625rem; }
 .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
 .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
 .py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
-.pb-2 { padding-bottom: 0.5rem; }
-
-.m-0 { margin: 0; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+.gap-1\.5 { gap: 0.375rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
 .mb-1 { margin-bottom: 0.25rem; }
 .mb-2 { margin-bottom: 0.5rem; }
 .mb-3 { margin-bottom: 0.75rem; }
@@ -90,101 +478,60 @@ body {
 .mb-5 { margin-bottom: 1.25rem; }
 .mt-0\.5 { margin-top: 0.125rem; }
 .mt-1 { margin-top: 0.25rem; }
-
+.w-full { width: 100%; }
+.max-w-sm { max-width: 24rem; }
+.max-w-xs { max-width: 20rem; }
+.w-7 { width: 1.75rem; }
+.h-7 { height: 1.75rem; }
 .rounded-full { border-radius: 9999px; }
 .rounded-xl { border-radius: 0.75rem; }
 .rounded-2xl { border-radius: 1rem; }
 .rounded-3xl { border-radius: 1.5rem; }
-
 .border { border-width: 1px; border-style: solid; border-color: #FAD2E1; }
 .border-2 { border-width: 2px; border-style: solid; }
-
 .bg-white { background-color: #FFFFFF; }
-.bg-white\/75 { background-color: rgba(255, 255, 255, 0.75); }
-.bg-white\/85 { background-color: rgba(255, 255, 255, 0.85); }
-.bg-white\/90 { background-color: rgba(255, 255, 255, 0.90); }
 .bg-white\/95 { background-color: rgba(255, 255, 255, 0.95); }
 .bg-black\/40 { background-color: rgba(0, 0, 0, 0.4); }
 .bg-\[\#FFF2DE\] { background-color: #FFF2DE; }
-.bg-\[\#FDE2E4\] { background-color: #FDE2E4; }
 .bg-pink-50\/40 { background-color: rgba(253, 242, 248, 0.4); }
 .bg-gray-100 { background-color: #F3F4F6; }
-
-.backdrop-blur-sm { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-.backdrop-blur-md { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.backdrop-blur-lg { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-
-.text-xs { font-size: 0.75rem; line-height: 1rem; }
-.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-.text-base { font-size: 1rem; line-height: 1.5rem; }
-.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-.text-2xl { font-size: 1.5rem; line-height: 2rem; }
-.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-.text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-.text-5xl { font-size: 3rem; line-height: 1; }
-
+.backdrop-blur-sm { backdrop-filter: blur(4px); }
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-base { font-size: 1rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.text-2xl { font-size: 1.5rem; }
+.text-3xl { font-size: 1.875rem; }
+.text-4xl { font-size: 2.25rem; }
+.text-5xl { font-size: 3rem; }
 .font-bold { font-weight: 700; }
 .font-black { font-weight: 900; }
-
+.text-center { text-align: center; }
 .text-white { color: #FFFFFF; }
 .text-\[\#4A3000\] { color: #4A3000; }
 .text-\[\#A67C52\] { color: #A67C52; }
 .text-\[\#FF5277\] { color: #FF5277; }
-.text-\[\#38B6FF\] { color: #38B6FF; }
-.text-\[\#3D5A80\] { color: #3D5A80; }
-.text-\[\#E07A5F\] { color: #E07A5F; }
-.text-\[\#6B4B00\] { color: #6B4B00; }
 .text-amber-700 { color: #B45309; }
 .text-pink-700 { color: #BE185D; }
 .text-purple-700 { color: #7E22CE; }
 .text-red-700 { color: #B91C1C; }
 .text-\[\#6B7280\] { color: #6B7280; }
-
-.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+.bg-amber-100 { background-color: #FEF3C7; }
+.bg-pink-100 { background-color: #FCE7F3; }
+.bg-purple-100 { background-color: #F3E8FF; }
+.bg-red-100 { background-color: #FEE2E2; }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
 .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
 
-/* 漸層色彩 */
 .bg-gradient-to-r.from-\[\#FF6B8B\].to-\[\#FF8E53\] {
   background: linear-gradient(to right, #FF6B8B, #FF8E53);
 }
 .bg-gradient-to-r.from-\[\#52D681\].to-\[\#38B6FF\] {
   background: linear-gradient(to right, #52D681, #38B6FF);
 }
-.bg-gradient-to-tr.from-\[\#FFF275\].to-\[\#FFD13B\] {
-  background: linear-gradient(to top right, #FFF275, #FFD13B);
-}
-.bg-gradient-to-tr.from-\[\#FF9AA2\].to-\[\#FFB7B2\] {
-  background: linear-gradient(to top right, #FF9AA2, #FFB7B2);
-}
 
-/* 觸控按鈕 Q 彈動效 */
-.touch-btn {
-  box-shadow: 0 6px 16px -2px rgba(235, 130, 160, 0.25), 0 2px 6px -1px rgba(0, 0, 0, 0.06);
-  cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  transition: transform 0.08s ease, filter 0.08s ease;
-}
-
-.touch-btn:active {
-  transform: scale(0.90) !important;
-  filter: brightness(0.94);
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  outline: none;
-}
-
-button:active {
-  transform: scale(0.95);
-}
-
-/* 難度卡片選中樣式 */
 .diff-card {
   border-color: #E2E8F0;
   transition: all 0.15s ease;
@@ -197,23 +544,15 @@ button:active {
   box-shadow: 0 8px 18px -4px rgba(255, 82, 119, 0.25);
 }
 
-/* 彈窗入場動畫 */
 @keyframes popIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.85);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+  0% { opacity: 0; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 .animate-pop {
   animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* Toggle Switch */
 .toggle-switch {
   appearance: none;
   -webkit-appearance: none;

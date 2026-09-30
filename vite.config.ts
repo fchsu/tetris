@@ -1,8 +1,14 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   base: process.env.NODE_ENV === 'production' ? '/tetris/' : '/',
+  test: {
+    environment: 'happy-dom',
+    globals: true,
+    include: ['tests/**/*.test.ts']
+  },
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
